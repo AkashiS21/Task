@@ -1,5 +1,9 @@
 package org.example;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+
 public class FlightObj {
     private String origin;
     private String origin_name;
@@ -45,19 +49,15 @@ public class FlightObj {
     }
 
     public Integer getDurationInMinutes() {
-        if (departure_time == null || arrival_time == null) {
+        if (departure_date == null || departure_time == null || arrival_date == null || arrival_time == null) {
             return null;
         }
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yy H:mm");
+        LocalDateTime departureDateTime = LocalDateTime.parse(departure_date + " " + departure_time, dateTimeFormatter);
+        LocalDateTime arrivalDateTime = LocalDateTime.parse(arrival_date + " " + arrival_time, dateTimeFormatter);
 
-        String[] departureParts = departure_time.split(":");
-        String[] arrivalParts = arrival_time.split(":");
+        long durationInMinutes = ChronoUnit.MINUTES.between(departureDateTime, arrivalDateTime);
 
-        int departureHour = Integer.parseInt(departureParts[0]);
-        int departureMinute = Integer.parseInt(departureParts[1]);
-        int arrivalHour = Integer.parseInt(arrivalParts[0]);
-        int arrivalMinute = Integer.parseInt(arrivalParts[1]);
-
-        return (arrivalHour - departureHour) * 60 + (arrivalMinute - departureMinute);
+        return (int) durationInMinutes;
     }
-
 }

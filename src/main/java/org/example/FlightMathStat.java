@@ -1,17 +1,16 @@
 package org.example;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.OptionalDouble;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class FlightMathStat {
-    List<FlightObj> flightObjList ;
+    private List<FlightObj> flightObjList;
+
     public FlightMathStat(List<FlightObj> flightObjList) {
         this.flightObjList = flightObjList;
     }
-    public void minDuration(){
+
+    public void minDuration() {
         Map<String, List<FlightObj>> flightsByCarrier = flightObjList
                 .stream()
                 .collect(Collectors.groupingBy(FlightObj::getCarrier));
@@ -24,28 +23,31 @@ public class FlightMathStat {
 
             Integer min = flights.stream()
                     .map(FlightObj::getDurationInMinutes)
+                    .filter(Objects::nonNull)
                     .min(Integer::compareTo)
                     .orElse(null);
 
-            System.out.println("Перевозчик: " + carrier + ", Минимальная время: " + min + " минут");
+            System.out.println("Перевозчик: " + carrier + ", Минимальная время: " + (min != null ? min + " минут" : "нет данных"));
         }
     }
+
     public void getDifferenceBetweenAveragePriceAndMedian() {
         List<Double> prices = flightObjList.stream()
                 .map(FlightObj::getPrice)
+                .filter(Objects::nonNull)
                 .sorted()
-                .toList();
+                .collect(Collectors.toList());
 
         if (prices.isEmpty()) {
             System.out.println("Нет данных для расчета.");
             return;
         }
 
-        OptionalDouble average = prices.stream()
+        double avgPrice = prices.stream()
                 .mapToDouble(Double::doubleValue)
-                .average();
+                .average()
+                .orElse(0.0);
 
-        double avgPrice = average.orElse(0.0);
         double medianPrice;
         int size = prices.size();
 
